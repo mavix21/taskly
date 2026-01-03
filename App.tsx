@@ -1,11 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
+import { theme } from "./theme";
 
 export default function App() {
+  const handleDelete = () => {
+    Alert.alert("Are you sure?", "This action cannot be undone.", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => console.log("Deleted"),
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <View style={styles.itemContainer}>
+        <Text style={styles.itemText}>Coffe</Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleDelete}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -13,8 +35,29 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+  },
+  itemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colorCerulean,
+    paddingHorizontal: 8,
+    paddingVertical: 16,
+  },
+  itemText: {
+    fontSize: 18,
+    fontWeight: 200,
+  },
+  button: {
+    backgroundColor: theme.colorBlack,
+    padding: 8,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: theme.colorWhite,
+    fontWeight: "bold",
   },
 });
