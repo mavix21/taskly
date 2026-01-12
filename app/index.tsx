@@ -10,6 +10,7 @@ import * as React from "react";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
 import { getFromStorage, saveToStorage } from "../utils/storage";
+import * as Haptics from "expo-haptics";
 
 const storageKey = "shopping-list";
 
@@ -60,23 +61,30 @@ export default function App() {
 
   const handleDelete = React.useCallback((id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShoppingList((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
   const handleOnToggle = React.useCallback((id: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              lastUpdatedTimestamp: Date.now(),
-              completedAtTimestamp: item.completedAtTimestamp
-                ? undefined
-                : Date.now(),
-            }
-          : item,
-      ),
+      prev.map((item) => {
+        if (item.id === id) {
+          if (item.completedAtTimestamp) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } else {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          }
+          return {
+            ...item,
+            lastUpdatedTimestamp: Date.now(),
+            completedAtTimestamp: item.completedAtTimestamp
+              ? undefined
+              : Date.now(),
+          };
+        }
+        return item;
+      }),
     );
   }, []);
 
