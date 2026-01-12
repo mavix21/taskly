@@ -2,6 +2,9 @@ import { StyleSheet, TextInput, View, FlatList, Text } from "react-native";
 import * as React from "react";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
+import { getFromStorage, saveToStorage } from "../utils/storage";
+
+const storageKey = "shopping-list";
 
 type ShoppingListItemType = {
   id: string;
@@ -10,48 +13,41 @@ type ShoppingListItemType = {
   lastUpdatedTimestamp: number;
 };
 
-const initialItems: ShoppingListItemType[] = [
-  {
-    id: "1",
-    name: "Coffee",
-    completedAtTimestamp: undefined,
-    lastUpdatedTimestamp: Date.now(),
-  },
-  {
-    id: "2",
-    name: "Rice",
-    completedAtTimestamp: undefined,
-    lastUpdatedTimestamp: Date.now(),
-  },
-  {
-    id: "3",
-    name: "Tea",
-    completedAtTimestamp: undefined,
-    lastUpdatedTimestamp: Date.now(),
-  },
-];
-
 export default function App() {
-  const [shoppingList, setShoppingList] =
-    React.useState<ShoppingListItemType[]>(initialItems);
+  const [shoppingList, setShoppingList] = React.useState<
+    ShoppingListItemType[]
+  >([]);
   const [value, setValue] = React.useState("");
+
+  React.useEffect(() => {
+    const fetchInitial = async () => {
+      const data = await getFromStorage(storageKey);
+      if (data) {
+        setShoppingList(data);
+      }
+    };
+    fetchInitial();
+  }, []);
 
   const handleSubmit = React.useCallback(() => {
     if (!value || value.trim() === "") {
       return;
     }
 
-    setShoppingList((prev) => [
+    const newShoppingList = [
       {
         id: Date.now().toString(),
         name: value,
         completedAtTimestamp: undefined,
         lastUpdatedTimestamp: Date.now(),
       },
-      ...prev,
-    ]);
+      ...shoppingList,
+    ];
+    setShoppingList(newShoppingList);
     setValue("");
-  }, [value]);
+
+    saveToStorage(storageKey, newShoppingList);
+  }, [shoppingList, value]);
 
   const handleDelete = React.useCallback((id: string) => {
     setShoppingList((prev) => prev.filter((item) => item.id !== id));
