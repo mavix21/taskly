@@ -78,6 +78,7 @@ export function ShoppingListItem({
 
 const styles = StyleSheet.create({
   itemContainer: {
+    backgroundColor: theme.colorWhite,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
