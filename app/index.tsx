@@ -7,12 +7,28 @@ type ShoppingListItemType = {
   id: string;
   name: string;
   completedAtTimestamp?: number;
+  lastUpdatedTimestamp: number;
 };
 
 const initialItems: ShoppingListItemType[] = [
-  { id: "1", name: "Coffee", completedAtTimestamp: undefined },
-  { id: "2", name: "Rice", completedAtTimestamp: undefined },
-  { id: "3", name: "Tea", completedAtTimestamp: undefined },
+  {
+    id: "1",
+    name: "Coffee",
+    completedAtTimestamp: undefined,
+    lastUpdatedTimestamp: Date.now(),
+  },
+  {
+    id: "2",
+    name: "Rice",
+    completedAtTimestamp: undefined,
+    lastUpdatedTimestamp: Date.now(),
+  },
+  {
+    id: "3",
+    name: "Tea",
+    completedAtTimestamp: undefined,
+    lastUpdatedTimestamp: Date.now(),
+  },
 ];
 
 export default function App() {
@@ -30,6 +46,7 @@ export default function App() {
         id: Date.now().toString(),
         name: value,
         completedAtTimestamp: undefined,
+        lastUpdatedTimestamp: Date.now(),
       },
       ...prev,
     ]);
@@ -46,6 +63,7 @@ export default function App() {
         item.id === id
           ? {
               ...item,
+              lastUpdatedTimestamp: Date.now(),
               completedAtTimestamp: item.completedAtTimestamp
                 ? undefined
                 : Date.now(),
@@ -57,7 +75,7 @@ export default function App() {
 
   return (
     <FlatList
-      data={shoppingList}
+      data={orderShoppingList(shoppingList)}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
@@ -103,6 +121,28 @@ export default function App() {
     //   ))}
     // </ScrollView>
   );
+}
+
+function orderShoppingList(shoppingList: ShoppingListItemType[]) {
+  return shoppingList.sort((item1, item2) => {
+    if (item1.completedAtTimestamp && item2.completedAtTimestamp) {
+      return item2.completedAtTimestamp - item1.completedAtTimestamp;
+    }
+
+    if (item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+      return 1;
+    }
+
+    if (!item1.completedAtTimestamp && item2.completedAtTimestamp) {
+      return -1;
+    }
+
+    if (!item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+      return item2.lastUpdatedTimestamp - item1.lastUpdatedTimestamp;
+    }
+
+    return 0;
+  });
 }
 
 const styles = StyleSheet.create({
