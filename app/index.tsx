@@ -1,4 +1,11 @@
-import { StyleSheet, TextInput, View, FlatList, Text } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  FlatList,
+  Text,
+  LayoutAnimation,
+} from "react-native";
 import * as React from "react";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
@@ -23,6 +30,7 @@ export default function App() {
     const fetchInitial = async () => {
       const data = await getFromStorage(storageKey);
       if (data) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setShoppingList(data);
       }
     };
@@ -43,6 +51,7 @@ export default function App() {
       },
       ...shoppingList,
     ];
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList(newShoppingList);
     setValue("");
 
@@ -50,10 +59,12 @@ export default function App() {
   }, [shoppingList, value]);
 
   const handleDelete = React.useCallback((id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
   const handleOnToggle = React.useCallback((id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShoppingList((prev) =>
       prev.map((item) =>
         item.id === id
