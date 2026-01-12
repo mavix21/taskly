@@ -6,13 +6,13 @@ import { theme } from "../theme";
 type ShoppingListItemType = {
   id: string;
   name: string;
-  isCompleted: boolean;
+  completedAtTimestamp?: number;
 };
 
 const initialItems: ShoppingListItemType[] = [
-  { id: "1", name: "Coffee", isCompleted: false },
-  { id: "2", name: "Rice", isCompleted: false },
-  { id: "3", name: "Tea", isCompleted: true },
+  { id: "1", name: "Coffee", completedAtTimestamp: undefined },
+  { id: "2", name: "Rice", completedAtTimestamp: undefined },
+  { id: "3", name: "Tea", completedAtTimestamp: undefined },
 ];
 
 export default function App() {
@@ -26,11 +26,34 @@ export default function App() {
     }
 
     setShoppingList((prev) => [
-      { id: Date.now().toString(), name: value, isCompleted: false },
+      {
+        id: Date.now().toString(),
+        name: value,
+        completedAtTimestamp: undefined,
+      },
       ...prev,
     ]);
     setValue("");
   }, [value]);
+
+  const handleDelete = React.useCallback((id: string) => {
+    setShoppingList((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  const handleOnToggle = React.useCallback((id: string) => {
+    setShoppingList((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              completedAtTimestamp: item.completedAtTimestamp
+                ? undefined
+                : Date.now(),
+            }
+          : item,
+      ),
+    );
+  }, []);
 
   return (
     <FlatList
@@ -38,7 +61,14 @@ export default function App() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-      renderItem={({ item }) => <ShoppingListItem {...item} />}
+      renderItem={({ item }) => (
+        <ShoppingListItem
+          onDelete={() => handleDelete(item.id)}
+          onToggleComplete={() => handleOnToggle(item.id)}
+          name={item.name}
+          isCompleted={Boolean(item.completedAtTimestamp)}
+        />
+      )}
       ListEmptyComponent={
         <View>
           <Text>Your shopping list is empty</Text>
@@ -79,7 +109,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 12,
+    paddingVertical: 12,
   },
   contentContainer: {
     paddingBottom: 24,
